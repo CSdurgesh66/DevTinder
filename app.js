@@ -4,8 +4,13 @@ const dbConnect = require("./config/database");
 const User = require("./models/User");
 const {validateSignUpData} = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
+
 
 app.use(express.json());
+app.use(cookieParser());
 
 // push data
 app.post("/signup",async (req, res) => {
@@ -77,17 +82,25 @@ app.post("/login", async(req,res) =>{
         console.log("req ki body",password);
         console.log("database se",user.password);
 
-        const presentPassword = await bcrypt.compare(password, user.password);
+        const presentPassword = user.validatePassword(password);
+
+        // const presentPassword = await bcrypt.compare(password, user.password);
         console.log("password match",presentPassword);
-        // if(bcrypt.compare(password,user.password)){
-        //     return res.status(200).json({
-        //         success: true,
-        //         message: "Login successful",
-        //     })
-        // }else {
-        //     throw new Error("Invalid password");
-        // }
-        if(!presentPassword){
+
+        const payload = {
+            _id:user._id,
+        }
+        const JWT_SECRET = process.env.JWT_SECRET;
+        if(presentPassword){
+
+            // create token
+            const token = await user.getJWT();
+            // const token = jwt.sign(payload,JWT_SECRET);
+            console.log(token);
+
+            res.cookie("token",token);
+            
+        }else {
             throw new Error("Invalid password");
         }
 
@@ -104,6 +117,35 @@ app.post("/login", async(req,res) =>{
         })
     }
 });
+
+// get profile
+app.get("/profile",userAuth,async(req,res) =>{
+    try{
+
+        const user = req.user;
+        // const cookie = req.cookies;
+        // console.log("cookie",cookie);
+
+        // const {token} = cookie;
+
+        // const decodedMsg = await jwt.verify(token,process.env.JWT_SECRET);
+        // console.log("decodedMsg",decodedMsg);
+
+        // const {_id} = decodedMsg;
+        // const data = await User.findById({_id:_id});
+        // console.log("Logged In user id" , _id);
+
+        res.status(200).json({
+            success: true,
+            message: "profile fetched successfully",
+            // data,
+            user,
+        })
+
+    }catch(error){
+        console.error(error);
+    }
+})
 
 // get data 
 app.get('/getData', async (req, res) => {
