@@ -5,7 +5,7 @@ const {userAuth} = require("../middlewares/auth");
 
 const {getProfile,updateProfile} = require("../controllers/Profile");
 
-router.get("/getprofile",userAuth,getProfile);
+router.get("/profile/view",userAuth,getProfile);
 router.patch("/updateprofile",userAuth,updateProfile);
 
 module.exports = router;

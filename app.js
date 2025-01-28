@@ -11,6 +11,7 @@ const {userAuth} = require("./middlewares/auth");
 
 const user = require("./routes/Auth");
 const profile = require("./routes/Profile");
+const request = require("./routes/Request");
 
 
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 app.use("/",user);
 app.use("/",profile);
+app.use("/",request);
 
 
 

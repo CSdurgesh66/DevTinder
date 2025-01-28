@@ -8,9 +8,6 @@ exports.signUp = async (req, res) => {
     try {
         // console.log(req.body);
         const { firstName, lastName, email, password, skills } = req.body;
-        
-      
-
         // validation
         validateSignUpData(req);
         // const {password} = req.body;
