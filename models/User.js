@@ -74,7 +74,17 @@ userSchema.methods.validatePassword = async function (passwordInputbyUser) {
     const user = this;
     const hassedPassword = user.password
 
-     const isPasswordValid = await bcrypt.compare(passwordInputbyUser, hassedPassword);
+    try {
+        console.log("Comparing passwords...");
+        const isPasswordValid = await bcrypt.compare(passwordInputbyUser, hassedPassword);
+        console.log("Comparison result:", isPasswordValid);
+        return isPasswordValid;
+    } catch (error) {
+        console.error("Error comparing passwords:", error);
+        return false;
+    }
+
+    //  const isPasswordValid = await bcrypt.compare(passwordInputbyUser, hassedPassword);
 
      return isPasswordValid;
 

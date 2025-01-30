@@ -66,20 +66,18 @@ exports.login = async (req, res) => {
         console.log("req body", password);
         console.log("from database ", user.password);
 
-        const presentPassword = user.validatePassword(password);
+        const presentPassword = await user.validatePassword(password);
 
-        // console.log("password match",presentPassword);
-
-
-        if (presentPassword) {
-
+        if (presentPassword==true) {
             // create token
             const token = await user.getJWT();
-            // console.log(token);
             res.cookie("token", token);
 
-        } else {
-            throw new Error("invalid credentials");
+        }else {
+            return res.status(400).json({
+                success: false,
+                message: "invalid credentials"
+            });
         }
         return res.status(200).json({
             success: true,
