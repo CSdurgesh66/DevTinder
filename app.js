@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const dbConnect = require("./config/database");
 const User = require("./models/User");
-// const {validateSignUpData} = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
@@ -11,7 +10,8 @@ const {userAuth} = require("./middlewares/auth");
 
 const user = require("./routes/Auth");
 const profile = require("./routes/Profile");
-const request = require("./routes/Request");
+const Sendrequest = require("./routes/Request");
+const allRequest = require("./routes/User");
 
 
 app.use(express.json());
@@ -20,14 +20,8 @@ app.use(cookieParser());
 
 app.use("/",user);
 app.use("/",profile);
-app.use("/",request);
-
-
-
-
-
-
-
+app.use("/",Sendrequest);
+app.use("/",allRequest);
 
 
 dbConnect()
