@@ -1,12 +1,12 @@
 const ConnectionRequest = require("../models/ConnectionRequest");
 const User = require("../models/User");
 
-exports.requestSendInterested = async (req, res) => { 
+exports.requestSendInterested = async (req, res) => {
     try {
         // this is userid whose is want to send request -> login account
-        const fromUserId = req.user._id;
-        const toUserId = req.params.toUserId;
-        const status = req.params.status;
+        const fromUserId = req.user._id;  // sender
+        const toUserId = req.params.toUserId; // receiver
+        const status = req.params.status; // request status
 
         console.log(fromUserId);
 
@@ -38,13 +38,11 @@ exports.requestSendInterested = async (req, res) => {
             return res.status(400).json({ message: "You have already sent a request to this user" });
         }
 
-
         const connectionRequest = new ConnectionRequest({
             fromUserId,
             toUserId,
             status,
         })
-
 
         const data = await connectionRequest.save();
 
@@ -55,7 +53,7 @@ exports.requestSendInterested = async (req, res) => {
         })
 
     } catch (error) {
-       return res.status(400).json({
+        return res.status(400).json({
             success: false,
             message: error.message,
         })
@@ -66,7 +64,7 @@ exports.requestReview = async (req, res) => {
     try {
 
         const loggedInUser = req.user; // loggedInId = toUseerId -> we want accept or rejected  the request
-        const {status, requestId } = req.params;
+        const { status, requestId } = req.params;
         console.log(status);
 
         const allowedStatus = ["accepted", "rejected"];
@@ -76,7 +74,7 @@ exports.requestReview = async (req, res) => {
 
         // check if the request exists
         const connectionRequest = await ConnectionRequest.findOne({
-            fromUserId: requestId,
+            _id: requestId,
             toUserId: loggedInUser._id,
             status: "interested"
         });

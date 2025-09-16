@@ -10,27 +10,32 @@ exports.signUp = async (req, res) => {
         validateSignUpData(req);
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword);
 
         const data = req.body;
-        console.log(data);
+        console.log("req body data", data);
 
         const user = new User({
             skills,
             firstName,
             lastName,
             email,
-            password,
             password: hashedPassword,
 
         }
         );
 
 
-        await user.save();
+        const savedUser = await user.save();
+        // create token 
+        const token = await savedUser.getJWT();
+
+        res.cookie("token", token, {
+            expires: new Date(Date.now() + 8 * 3600000),
+        });
         return res.status(200).json({
             success: true,
-            message: "data saved successfully",
+            data: savedUser,
+            message: "user signup successfully",
         })
     } catch (error) {
         console.error(error);
@@ -68,12 +73,12 @@ exports.login = async (req, res) => {
 
         const presentPassword = await user.validatePassword(password);
 
-        if (presentPassword==true) {
+        if (presentPassword == true) {
             // create token
             const token = await user.getJWT();
             res.cookie("token", token);
 
-        }else {
+        } else {
             return res.status(400).json({
                 success: false,
                 message: "invalid credentials"
@@ -81,7 +86,8 @@ exports.login = async (req, res) => {
         }
         return res.status(200).json({
             success: true,
-            message: "Login successful",
+            data: user,
+            message: "Login successfully",
         });
 
     } catch (error) {

@@ -5,69 +5,71 @@ const jwt = require("jsonwebtoken");
 
 
 const userSchema = new mongoose.Schema({
-    firstName:{
-        type:String,
-        required:true,
-        minLength:4,
-        maxLength:20,
+    firstName: {
+        type: String,
+        required: true,
+        minLength: 4,
+        maxLength: 20,
     },
-    lastName:{
-        type:String,
+    lastName: {
+        type: String,
     },
-    email:{
-        type:String,
-        required:true,
-        trim:true,
-        unique:true, // doubt -> not working 
-        lowercase:true,
-        validate(value){
-            if(!validator.isEmail(value)){
-                throw new Error("Invalid Email address");
-        }
-    }
-        
-    },
-    password:{
-        type:String,
-    },
-    age:{
-        type:Number,
-        min:18,
-    },
-    gender:{
-        type:String,
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true,
+        lowercase: true,
         validate(value) {
-            if(!["male","female","other"].includes(value)){
+            if (!validator.isEmail(value)) {
+                throw new Error("Invalid Email address");
+            }
+        }
+
+    },
+    password: {
+        type: String,
+    },
+    age: {
+        type: Number,
+        min: 18,
+    },
+    gender: {
+        type: String,
+        validate(value) {
+            if (!["Male", "Female", "Other"].includes(value)) {
                 throw new Error(" gender is not valid , ");
             }
         }
     },
-    photoUrl:{
-        type:String,
-        default:"This is url of default image",
+    photoUrl: {
+        type: String,
+        default: `https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png`
+
     },
-    about:{
-        type:String,
-        default:"this is a about of user -> default"
+    about: {
+        type: String,
+        default: "This is default about",
+
+
     },
-    skills:{
-        type:[String],
+    skills: {
+        type: [String],
     }
-},{
-    timestamps:true,
+}, {
+    timestamps: true,
 })
 
 // userSchema.index({ email: 1 }, { unique: true });
-
 userSchema.methods.getJWT = async function () {
     const user = this;
     const payload = {
-        _id : user._id,
+        _id: user._id,
     }
     // create token
-     const token = jwt.sign(payload,process.env.JWT_SECRET,{ expiresIn :"7d"});
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-     return token;
+    return token;
 }
 
 userSchema.methods.validatePassword = async function (passwordInputbyUser) {
@@ -84,12 +86,8 @@ userSchema.methods.validatePassword = async function (passwordInputbyUser) {
         return false;
     }
 
-    //  const isPasswordValid = await bcrypt.compare(passwordInputbyUser, hassedPassword);
-
-     return isPasswordValid;
-
 
 }
 
 
-module.exports = mongoose.model("User",userSchema);
+module.exports = mongoose.model("User", userSchema);
