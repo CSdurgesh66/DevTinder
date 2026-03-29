@@ -37,12 +37,20 @@ exports.signUp = async (req, res) => {
             data: savedUser,
             message: "user signup successfully",
         })
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
+    } catch (err) {
+        console.log(err);
+        if (err.errors) {
+            const message = Object.values(err.errors)[0].message;
+            return res.status(400).json({
+                success: false,
+                message,
+            });
+        }
+
+        return res.status(400).json({
             success: false,
-            errror: error.message,
-        })
+            message: err.message,
+        });
     }
 }
 

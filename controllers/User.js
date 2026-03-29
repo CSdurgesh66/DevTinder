@@ -1,6 +1,7 @@
 
 const ConnectionRequest = require("../models/ConnectionRequest");
 const User = require("../models/User");
+const { scoreFeedBatch } = require("../utils/aiMatcher");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills"
 
@@ -81,9 +82,12 @@ exports.getFeed = async (req, res) => {
         connectionRequests.forEach(req => {
             hideUserFromFeed.add(req.fromUserId.toString());
             hideUserFromFeed.add(req.toUserId.toString());
-
         });
         // console.log(hideUserFromFeed);
+
+
+        //  fetch a large pool for page 1 so ranking is meaningful
+        const poolSize = page=== 1 ? Math.min(limit * 3, 50) : limit;
 
         const users = await User.find({
             $and: [
@@ -93,11 +97,24 @@ exports.getFeed = async (req, res) => {
         })
             .select(USER_SAFE_DATA)
             .skip(skip)
-            .limit(limit);
+            .limit(poolSize);
+
+        if(users.length === 0){
+            return res.status(200).json({
+                success:true,
+                data:[]
+            })
+        }
+
+        //  AI score and rank
+        const mySkills = loggedInUser.skills || [];
+        const rankedUsers = await scoreFeedBatch(mySkills,users);
+
 
         return res.status(200).json({
             success: true,
-            data: users
+            data: rankedUsers.slice(0,limit),
+            meta:{page,limit,aiRanked:true}
         })
 
 
