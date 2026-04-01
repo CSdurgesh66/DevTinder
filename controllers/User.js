@@ -66,7 +66,7 @@ exports.getFeed = async (req, res) => {
         const loggedInUser = req.user;
 
         const page = req.query.page || 1;
-        let limit = req.query.limit || 10;
+        let limit = req.query.limit || 20;
         limit = limit > 50 ? 50 : limit;
         const skip = (page - 1) * limit;
 
@@ -84,7 +84,6 @@ exports.getFeed = async (req, res) => {
             hideUserFromFeed.add(req.toUserId.toString());
         });
         // console.log(hideUserFromFeed);
-
 
         //  fetch a large pool for page 1 so ranking is meaningful
         const poolSize = page=== 1 ? Math.min(limit * 3, 50) : limit;

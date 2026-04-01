@@ -74,6 +74,8 @@ async function scoreFeedBatch(mySkills, feedUsers) {
         })
     )
 
+    scored.sort((a, b) => b.matchScore - a.matchScore);
+
     return scored;
 
 }
